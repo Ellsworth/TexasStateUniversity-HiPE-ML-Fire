@@ -1,77 +1,50 @@
-# Copyright 2016 Open Source Robotics Foundation, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import rclpy
 from rclpy.node import Node
 
-from std_msgs.msg import String
+#from std_msgs.msg import String
+from float_package.msg import Num 
+import board
+import adafruit_bme680
+#from BME680 import *
 
-"""
-public interface enviromentalSensor {
-    void temp(self)
-    void pressure(self)
-    void humitdy(self)
-}
-
-class MinimalPublisher implements envSensor {
-
-
-}
-
-
-publish to all type envSensor
-
-
-
-
-
-abstract class Sensors (){
-
-}
-
-class envSensor extends Sensors() {
-
-
-}
-
-class mic(Sensors) {
-
-
-}
-
-call publish function 
-def publish():
-    print(whatever var )
-"""
 
 class MinimalPublisher(Node):
 
     def __init__(self):
         super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 1  # seconds
+        #self.publisher_ = self.create_publisher(String, 'topic', 10)
+        self.publisher_ = self.create_publisher(Num, 'topic', 10)
+        timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
-    def timer_callback(self):
-        msg = String()
-        msg.data = 'Hello World: %d' % self.i
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
-    
+    def temp_sensor():
+        i2c = board.I2C()
+        sensor = adafruit_bme680.Adafruit_BME680_I2C(i2c)
+        return str(sensor.temperature)
 
+   # TODO: Add temp_sensor() support
+   # TODO: Add humdity_sensor() support
+   # TODO: Add pressure_sensor() support
+   # TODO: Add camera support with interface
+   # TODO: Convert all data types to float
+   # TODO: Be able to return sensor data to other files
+
+
+    def timer_callback(self):
+        #msg = String()
+        msg = Num()
+        #msg.data = 'Hello World: %d' % self.i
+        msg.num = self.i
+          
+        #i2c = board.I2C()
+        #sensor = adafruit_bme680.Adafruit_BME680_I2C(i2c)
+        #msg.data = str(sensor.temperature * 9/5 + 32)
+
+        self.publisher_.publish(msg)
+        #self.get_logger().info('Publishing: "%s"' % msg.data)
+        self.get_logger().info('Publishing: "%d"' % msg.num) 
+        self.i += 1
 
 
 def main(args=None):
