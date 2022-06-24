@@ -14,3 +14,6 @@ talker:
 listener:
 	. install/setup.bash
 	ros2 run py_pubsub listener
+
+clean:
+	rm -rf ./build ./log ./install
